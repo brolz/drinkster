@@ -19,7 +19,7 @@ router.post("/register", (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
 
   if (!isValid) {
-    return res.status(400).json("The follwing error occured: " + errors);
+    return res.status(400).json("The following error occured: " + errors);
   }
 
   //Check if user exist, if not then create new user
@@ -32,24 +32,22 @@ router.post("/register", (req, res) => {
         email: req.body.email,
         password: req.body.password,
       });
-    }
-
-    //Hash password before sending to DB
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(newUser.password, salt, (err, hash) => {
-        if (err) throw err;
-        newUser.password = hash;
-        newUser
-          .save()
-          .then((user) => res.json(user))
-          .catch((err) => console.log(err));
+      //Hash password before sending to DB
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+          if (err) throw err;
+          newUser.password = hash;
+          newUser
+            .save()
+            .then((user) => res.json(user))
+            .catch((err) => console.log(err));
+        });
       });
-    });
+    }
   });
 });
 
 //Login Route
-
 router.post("/login", (req, res) => {
   const { errors, isValid } = validateLoginInput(req.body);
 
@@ -65,6 +63,8 @@ router.post("/login", (req, res) => {
     if (!user) {
       return res.status(404).json({ emailnotfound: "Email not found" });
     }
+
+    //If password matches password in DB, token is given
     bcrypt.compare(password, user.password).then((isMatch) => {
       if (isMatch) {
         const payload = {

@@ -1,8 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const passport = require("passport");
 
 require("dotenv").config();
+
+const users = require("./routes/api/users");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -22,6 +25,15 @@ mongoose
       "The following error occured while connecting to the database: " + err
     )
   );
+
+//Passport middleware
+app.use(passport.initialize());
+
+//Passport config
+require("./passport")(passport);
+
+//Routes
+app.use("/api/users", users);
 
 const connection = mongoose.connection;
 connection.once("open", () => {
